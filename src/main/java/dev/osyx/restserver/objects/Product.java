@@ -1,27 +1,33 @@
 package dev.osyx.restserver.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.util.Objects;
+
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
+@SuppressWarnings("unused")
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue
+    private Long id;
     private double price;
     private String title;
+    @Column(length = 1000)
     private String description;
     private String category;
     private String image;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public Product setId(long id) {
+    public Product setId(Long id) {
         this.id = id;
         return this;
     }
@@ -69,5 +75,32 @@ public class Product {
     public Product setImage(String image) {
         this.image = image;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof Product product
+                && Objects.equals(title, product.title)
+                && Objects.equals(description, product.description)
+                && Objects.equals(category, product.category)
+                && Objects.equals(image, product.image)
+                && Objects.equals(price, product.price);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, price);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", price=" + price +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", category='" + category + '\'' +
+                ", image='" + image + '\'' +
+                '}';
     }
 }
