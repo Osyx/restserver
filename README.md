@@ -18,3 +18,7 @@ Optional arguments:
 Method: GET   
 Action: Get specific product by id    
 URI: /products/{productid}   
+
+### Example requests:   
+
+Example requests can be found in the [test-requests](test-requests.http) file.
