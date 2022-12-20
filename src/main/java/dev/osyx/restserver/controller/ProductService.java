@@ -20,14 +20,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class Controller {
+public class ProductService {
 
-    private static final Logger log = LoggerFactory.getLogger(Controller.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
     private static final int PAGE_SIZE = 8;
     private final ProductRepository repository;
     private final ExternalRepository externalRepository;
 
-    public Controller(ProductRepository repository) {
+    public ProductService(ProductRepository repository) {
         this.repository = Objects.requireNonNull(repository);
         this.externalRepository = new ExternalRepository();
     }

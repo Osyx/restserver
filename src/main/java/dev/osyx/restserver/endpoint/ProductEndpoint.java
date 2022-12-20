@@ -1,6 +1,6 @@
 package dev.osyx.restserver.endpoint;
 
-import dev.osyx.restserver.controller.Controller;
+import dev.osyx.restserver.controller.ProductService;
 import dev.osyx.restserver.db.ProductRepository;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,19 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
-import static dev.osyx.restserver.controller.Controller.getAllowAllFilter;
-import static dev.osyx.restserver.controller.Controller.getJacksonValue;
-import static dev.osyx.restserver.controller.Controller.getPagedProducts;
-
 @RestController
 public class ProductEndpoint {
 
     private static final String PRODUCTS_ENDPOINT = "/products";
-    private final Controller controller;
+    private final ProductService productService;
 
     @Autowired
     public ProductEndpoint(ProductRepository repository) {
-        this.controller = new Controller(Objects.requireNonNull(repository));
+        this.productService = new ProductService(Objects.requireNonNull(repository));
     }
 
     @GetMapping("/")
@@ -39,7 +35,7 @@ public class ProductEndpoint {
 
     @GetMapping(value = PRODUCTS_ENDPOINT, params = Parameters.PAGE)
     public MappingJacksonValue products(@RequestParam(Parameters.PAGE) int page) {
-        return getPagedProducts(page, controller::getAllProducts);
+        return ProductService.getPagedProducts(page, productService::getAllProducts);
     }
 
     @GetMapping(value = PRODUCTS_ENDPOINT, params = {Parameters.MIN_PRICE, Parameters.MAX_PRICE})
@@ -52,7 +48,7 @@ public class ProductEndpoint {
     public MappingJacksonValue products(@RequestParam(Parameters.MIN_PRICE) int minPrice,
                                         @RequestParam(Parameters.MAX_PRICE) int maxPrice,
                                         @RequestParam(Parameters.PAGE) int page) {
-        return getPagedProducts(page, paging -> controller.getProductsByPriceBetween(minPrice, maxPrice, paging));
+        return ProductService.getPagedProducts(page, paging -> productService.getProductsByPriceBetween(minPrice, maxPrice, paging));
     }
 
     @GetMapping(value = PRODUCTS_ENDPOINT, params = Parameters.CATEGORY)
@@ -64,12 +60,12 @@ public class ProductEndpoint {
     public MappingJacksonValue products(@RequestParam(Parameters.CATEGORY) String category,
                                         @RequestParam(Parameters.PAGE) int page) {
         String sanitizedCategory = StringEscapeUtils.escapeJava(category);
-        return getPagedProducts(page, paging -> controller.getAllProductsByCategory(sanitizedCategory, paging));
+        return ProductService.getPagedProducts(page, paging -> productService.getAllProductsByCategory(sanitizedCategory, paging));
     }
 
     @GetMapping(PRODUCTS_ENDPOINT + "/{id}")
     public MappingJacksonValue products(@PathVariable Long id) {
-        var product = controller.getProduct(id);
-        return getJacksonValue(product, getAllowAllFilter());
+        var product = productService.getProduct(id);
+        return ProductService.getJacksonValue(product, ProductService.getAllowAllFilter());
     }
 }
