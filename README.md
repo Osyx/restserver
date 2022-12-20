@@ -6,7 +6,12 @@ Has two endpoints:
 
 Method: GET   
 Action: Get all products   
-URI: /products
+URI: /products   
+Optional arguments:
+
+- page:number, can be combined with the other arguments as well
+- min_price:number & max_price:number
+- category:string
 
 ### Product detail endpoint:
 

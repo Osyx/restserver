@@ -72,7 +72,7 @@ public class ProductService {
         return getProductPageFromList(pageable, allProducts);
     }
 
-    public Page<Product> getProductsByPriceBetween(int minPrice, int maxPrice, Pageable paging) {
+    public Page<Product> getProductsByPriceBetween(double minPrice, double maxPrice, Pageable paging) {
         return repository.findAllByPriceBetween(minPrice, maxPrice, paging);
     }
 

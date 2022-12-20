@@ -2,6 +2,24 @@
 GET http://localhost:8080/
 
 ###
+GET http://localhost:8080/products/1
+
+###
+GET http://localhost:8080/products/14
+
+###
+GET http://localhost:8080/products/11
+
+###
+GET http://localhost:8080/products/14
+
+###
+GET http://localhost:8080/products/100
+
+###
+GET http://localhost:8080/products/-1
+
+###
 GET http://localhost:8080/products
 
 ###
@@ -30,21 +48,3 @@ GET http://localhost:8080/products?category=men's clothing
 
 ###
 GET http://localhost:8080/products?category=men's clothing&page=1
-
-###
-GET http://localhost:8080/products/1
-
-###
-GET http://localhost:8080/products/14
-
-###
-GET http://localhost:8080/products/11
-
-###
-GET http://localhost:8080/products/14
-
-###
-GET http://localhost:8080/products/100
-
-###
-GET http://localhost:8080/products/-1

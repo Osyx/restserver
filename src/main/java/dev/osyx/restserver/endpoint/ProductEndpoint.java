@@ -39,14 +39,14 @@ public class ProductEndpoint {
     }
 
     @GetMapping(value = PRODUCTS_ENDPOINT, params = {Parameters.MIN_PRICE, Parameters.MAX_PRICE})
-    public MappingJacksonValue products(@RequestParam(Parameters.MIN_PRICE) int minPrice,
-                                        @RequestParam(Parameters.MAX_PRICE) int maxPrice) {
+    public MappingJacksonValue products(@RequestParam(Parameters.MIN_PRICE) double minPrice,
+                                        @RequestParam(Parameters.MAX_PRICE) double maxPrice) {
         return products(minPrice, maxPrice, 0);
     }
 
     @GetMapping(value = PRODUCTS_ENDPOINT, params = {Parameters.MIN_PRICE, Parameters.MAX_PRICE, Parameters.PAGE})
-    public MappingJacksonValue products(@RequestParam(Parameters.MIN_PRICE) int minPrice,
-                                        @RequestParam(Parameters.MAX_PRICE) int maxPrice,
+    public MappingJacksonValue products(@RequestParam(Parameters.MIN_PRICE) double minPrice,
+                                        @RequestParam(Parameters.MAX_PRICE) double maxPrice,
                                         @RequestParam(Parameters.PAGE) int page) {
         return ProductService.getPagedProducts(page, paging -> productService.getProductsByPriceBetween(minPrice, maxPrice, paging));
     }
