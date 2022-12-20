@@ -10,6 +10,7 @@ import dev.osyx.restserver.objects.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,10 +23,12 @@ import java.util.function.Function;
 
 public class ProductService {
 
-    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProductService.class);
     private static final int PAGE_SIZE = 8;
     private final ProductRepository repository;
     private final ExternalRepository externalRepository;
+
+    private boolean hasFetchedAllFromExternal = false;
 
     public ProductService(ProductRepository repository) {
         this.repository = Objects.requireNonNull(repository);
@@ -50,13 +53,23 @@ public class ProductService {
         return repository.findByExternalId(id)
                 .or(() -> getAndSaveProduct(id))
                 .orElseThrow(() -> {
-                    log.debug(String.format("Call to product endpoint with id '%d' ended in an exception.", id));
+                    LOG.debug(String.format("Call to product endpoint with id '%d' ended in an exception.", id));
                     throw new ProductNotFoundException(id);
                 });
     }
 
     public Page<Product> getAllProducts(Pageable pageable) {
-        return repository.findAll(pageable);
+        if (hasFetchedAllFromExternal) {
+            return repository.findAll(pageable);
+        }
+
+        var allProducts = externalRepository.getAllProducts();
+        var productsNotInDb = allProducts.stream()
+                .filter(product -> !repository.existsByExternalId(product.getId()))
+                .toList();
+        repository.saveAll(productsNotInDb);
+        hasFetchedAllFromExternal = true;
+        return getProductPageFromList(pageable, allProducts);
     }
 
     public Page<Product> getProductsByPriceBetween(int minPrice, int maxPrice, Pageable paging) {
@@ -65,6 +78,15 @@ public class ProductService {
 
     public Page<Product> getAllProductsByCategory(String sanitizedCategory, Pageable paging) {
         return repository.findAllByCategoryIgnoreCase(sanitizedCategory, paging);
+    }
+
+    private Optional<Product> getAndSaveProduct(Long id) {
+        Optional<Product> product = externalRepository.getProduct(id);
+        product.ifPresent(entity -> {
+            var savedProduct = repository.save(entity);
+            LOG.debug(String.format("Saving object: '%s'.", savedProduct));
+        });
+        return product;
     }
 
     public static SimpleFilterProvider getAllowAllFilter() {
@@ -78,17 +100,14 @@ public class ProductService {
         return mappingJacksonValue;
     }
 
-    private Optional<Product> getAndSaveProduct(Long id) {
-        Optional<Product> product = externalRepository.getProduct(id);
-        product.ifPresent(entity -> {
-            var savedProduct = repository.save(entity);
-            log.debug(String.format("Saving object: '%s'.", savedProduct));
-        });
-        return product;
-    }
-
     private static SimpleFilterProvider getDescriptionFilter() {
         return new SimpleFilterProvider()
                 .addFilter(Product.PRODUCT_FILTER, SimpleBeanPropertyFilter.serializeAllExcept("description"));
+    }
+
+    private static PageImpl<Product> getProductPageFromList(Pageable pageable, List<Product> allProducts) {
+        var offset = Math.toIntExact(pageable.getOffset());
+        var subProducts = allProducts.subList(offset, offset + pageable.getPageSize());
+        return new PageImpl<>(subProducts, pageable, allProducts.size());
     }
 }

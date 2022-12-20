@@ -16,4 +16,6 @@ public interface ProductRepository extends ListCrudRepository<Product, Long>, Li
     Page<Product> findAllByPriceBetween(double min, double max, Pageable pageable);
 
     Optional<Product> findByExternalId(long externalId);
+
+    boolean existsByExternalId(long externalId);
 }

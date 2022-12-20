@@ -14,16 +14,16 @@ import java.util.List;
 @Configuration
 class LoadDatabase {
 
-    private static final Logger log = LoggerFactory.getLogger(LoadDatabase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoadDatabase.class);
 
     @Bean
     CommandLineRunner initDatabase(ProductRepository repository) {
         return args -> {
-            log.debug("Starting...");
+            LOG.debug("Starting...");
             List<Product> products = new ExternalRepository().getSomeProducts();
             repository.saveAll(products)
-                    .forEach(savedObject -> log.debug("Saved: {}", savedObject));
-            log.debug("Done preloading!");
+                    .forEach(savedObject -> LOG.debug("Saved: {}", savedObject));
+            LOG.debug("Done preloading!");
         };
     }
 }
