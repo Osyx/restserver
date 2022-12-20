@@ -1,7 +1,9 @@
 package dev.osyx.restserver.objects;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +21,10 @@ public class Product {
 
     @Id
     @GeneratedValue
-    private Long id;
+    @JsonIgnore
+    private Long identity;
+    @JsonProperty("id")
+    private Long externalId;
     private double price;
     private String title;
     @Column(length = 1000)
@@ -28,11 +33,11 @@ public class Product {
     private String image;
 
     public Long getId() {
-        return id;
+        return externalId;
     }
 
     public Product setId(Long id) {
-        this.id = id;
+        this.externalId = id;
         return this;
     }
 
@@ -84,6 +89,7 @@ public class Product {
     @Override
     public boolean equals(Object o) {
         return this == o || o instanceof Product product
+                && Objects.equals(externalId, product.externalId)
                 && Objects.equals(title, product.title)
                 && Objects.equals(description, product.description)
                 && Objects.equals(category, product.category)
@@ -93,13 +99,13 @@ public class Product {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, price);
+        return Objects.hash(identity, externalId, title, price);
     }
 
     @Override
     public String toString() {
         return "Product {" +
-                "id=" + id +
+                "id=" + externalId +
                 ", price=" + price +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

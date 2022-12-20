@@ -36,7 +36,7 @@ public class Controller {
         if (page < 0) {
             throw new IllegalArgumentException("Page size cannot be less than zero.");
         }
-        Pageable paging = PageRequest.of(page, PAGE_SIZE, Sort.by("id").ascending());
+        Pageable paging = PageRequest.of(page, PAGE_SIZE, Sort.by("externalId").ascending());
         Page<Product> productPage = getProductPage.apply(paging);
         if (page > productPage.getTotalPages()) {
             throw new ProductNotFoundException();
@@ -47,7 +47,7 @@ public class Controller {
     }
 
     public Product getProduct(Long id) {
-        return repository.findById(id)
+        return repository.findByExternalId(id)
                 .or(() -> getAndSaveProduct(id))
                 .orElseThrow(() -> {
                     log.debug(String.format("Call to product endpoint with id '%d' ended in an exception.", id));
