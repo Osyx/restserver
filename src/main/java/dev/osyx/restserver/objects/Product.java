@@ -1,5 +1,6 @@
 package dev.osyx.restserver.objects;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,8 +11,11 @@ import java.util.Objects;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFilter(Product.PRODUCT_FILTER)
 @SuppressWarnings("unused")
 public class Product {
+
+    public static final String PRODUCT_FILTER = "productFilter";
 
     @Id
     @GeneratedValue
@@ -94,7 +98,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product{" +
+        return "Product {" +
                 "id=" + id +
                 ", price=" + price +
                 ", title='" + title + '\'' +
