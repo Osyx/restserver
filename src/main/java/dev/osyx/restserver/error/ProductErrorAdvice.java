@@ -18,4 +18,11 @@ final class ProductErrorAdvice {
     static String productNotFoundHandler(ProductNotFoundException ex) {
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    static String faultyCallHandler(IllegalArgumentException ex) {
+        return ex.getMessage();
+    }
 }
